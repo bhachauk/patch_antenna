@@ -31,7 +31,7 @@ class DesignPatch:
     er = None
     h = None
     patch_length = None
-    pl_eff = None
+    patch_lengthl_eff = None
     patch_width = None
     feeder_length = None
     feeder_width = None
@@ -43,7 +43,7 @@ class DesignPatch:
     ground_length = None
     ground_width = None
     inset_length = None
-    input_imp = None
+    input_impedance = None
 
     def __init__(self, freq, er, h):
         """
@@ -70,15 +70,15 @@ class DesignPatch:
         f1 = (self.e_eff + 0.3) * (self.patch_width / self.h + 0.264)
         f2 = (self.e_eff - 0.258) * (self.patch_width / self.h + 0.8)
         self.delta_l = self.h * 0.412 * (f1 / f2)
-        self.pl_eff = (self.wavelength / sqrt(self.e_eff)) / 2
-        self.patch_length = self.pl_eff - 2 * self.delta_l
+        self.patch_lengthl_eff = (self.wavelength / sqrt(self.e_eff)) / 2
+        self.patch_length = self.patch_lengthl_eff - 2 * self.delta_l
 
     def set_feeder_width_length(self):
         self.feeder_length = (light_velocity / (4 * self.freq)) * (sqrt(1 / self.e_eff))
         self.feeder_width = (2 * self.patch_width) / 5
         self.inset_gap = self.patch_width / 5
         self.set_input_impedance()
-        self.inset_length = (self.patch_length / pi) * (math.acos(sqrt(impedance / self.input_imp)))
+        self.inset_length = (self.patch_length / pi) * (math.acos(sqrt(impedance / self.input_impedance)))
         self.ground_length = self.patch_length + self.feeder_length + (6 * self.h)
         self.ground_width = self.patch_width + self.feeder_width + (6 * self.h)
 
@@ -93,7 +93,7 @@ class DesignPatch:
         result[inset_length_n] = self.inset_length
         result[ground_length_n] = self.ground_length
         result[ground_width_n] = self.ground_width
-        result[edge_impedance_n] = self.input_imp
+        result[edge_impedance_n] = self.input_impedance
         return result
 
     def get_k(self):
@@ -123,4 +123,4 @@ class DesignPatch:
 
     def set_input_impedance(self):
         G1, G12 = self.getG1(), self.getG12()
-        self.input_imp = 1/(2*(G1+G12))
+        self.input_impedance = 1 / (2 * (G1 + G12))
