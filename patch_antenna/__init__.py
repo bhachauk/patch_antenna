@@ -3,3 +3,4 @@ __version__ = '0.0.3'
 
 from .designer import design
 from .designer import DesignPatch
+from .designer import write_gerber

@@ -51,6 +51,14 @@ print(result)
 ```
 
 
+#### Write as Gerber file
+
+```python
+pa.write_gerber(freq, er, h, 'patch_design_2.4GHz_4.4_er_1.6_h.gbr')
+```
+
+This will write the design in gerber file format. (Currently it will support only for normal feed type).
+
 #### Future:
 
-- Generating `gerber` files. 
+- Generating `gerber` files for inset feed type too.

@@ -15,3 +15,7 @@ result = pa.design(freq, er, h)
 
 # pretty printing
 print(json.dumps(result, indent=4))
+
+
+# To write as gerber file
+pa.write_gerber(freq, er, h, '/tmp/patch_design.gbr')

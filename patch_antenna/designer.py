@@ -25,6 +25,14 @@ def design(resonant_frequency, dielectric_constant, thickness):
     return DesignPatch(resonant_frequency, dielectric_constant, thickness).get_result()
 
 
+def write_gerber(resonant_frequency, dielectric_constant, thickness, file_name):
+    """Calculate design values in inch"""
+    d = DesignPatch(resonant_frequency, dielectric_constant, thickness)
+    content = get_gerber_str(d)
+    with (open(file_name, 'w')) as f:
+        f.write(content)
+
+
 class DesignPatch:
     """All parameter calculations"""
     freq = None
@@ -75,12 +83,12 @@ class DesignPatch:
 
     def set_feeder_width_length(self):
         self.feeder_length = (light_velocity / (4 * self.freq)) * (sqrt(1 / self.e_eff))
-        self.feeder_width = (2 * self.patch_width) / 5
+        self.feeder_width = self.patch_width / 5
         self.inset_gap = self.patch_width / 5
         self.set_input_impedance()
         self.inset_length = (self.patch_length / pi) * (math.acos(sqrt(impedance / self.input_impedance)))
-        self.ground_length = self.patch_length + self.feeder_length + (6 * self.h)
-        self.ground_width = self.patch_width + self.feeder_width + (6 * self.h)
+        self.ground_length = self.patch_length + self.feeder_length + self.get_fringing_l()
+        self.ground_width = self.patch_width + self.feeder_width + self.get_fringing_l()
 
     def get_result(self):
         result = dict()
@@ -95,6 +103,9 @@ class DesignPatch:
         result[ground_width_n] = self.ground_width
         result[edge_impedance_n] = self.input_impedance
         return result
+
+    def get_fringing_l(self):
+        return 6 * self.h
 
     def get_k(self):
         k0 = (2*pi)/self.wavelength
@@ -124,3 +135,39 @@ class DesignPatch:
     def set_input_impedance(self):
         G1, G12 = self.getG1(), self.getG12()
         self.input_impedance = 1 / (2 * (G1 + G12))
+
+
+def m_to_inch(val):
+    return 39.3701 * val
+
+
+def get_gerber_str(d):
+    fl = m_to_inch(d.feeder_length)
+    fw = m_to_inch(d.feeder_width)
+    pl = m_to_inch(d.patch_length)
+    pw = m_to_inch(d.patch_width)
+    fringing_l = m_to_inch(d.get_fringing_l())
+    init_x = "{:.4f}".format((fl/2) + fringing_l).replace('.', '')
+    init_y = "{:.4f}".format(fringing_l).replace('.', '')
+    patch_x = "{:.4f}".format(fl + fringing_l + (pl/2)).replace('.', '')
+    gerber_format = f"""
+G04 ===== Begin FILE IDENTIFICATION =====*
+G04 File Format:  Gerber RS274X*
+G04 ===== End FILE IDENTIFICATION =====*
+%FSLAX24Y24*%
+%MOIN*%
+%SFA1.0000B1.0000*%
+%OFA0.0B0.0*%
+%ADD14R,{fl}X{fw}*%
+%ADD15R,{pl}X{pw}*%
+%LNcond*%
+%IPPOS*%
+%LPD*%
+G75*
+D14*
+X{init_x}Y{init_y}D03*
+D15*
+X{patch_x}*
+M02*
+    """
+    return gerber_format
