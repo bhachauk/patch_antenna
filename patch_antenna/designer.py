@@ -25,10 +25,10 @@ def design(resonant_frequency, dielectric_constant, thickness):
     return DesignPatch(resonant_frequency, dielectric_constant, thickness).get_result()
 
 
-def write_gerber(resonant_frequency, dielectric_constant, thickness, file_name):
+def write_gerber(resonant_frequency, dielectric_constant, thickness, file_name, feed_type):
     """Calculate design values in inch"""
     d = DesignPatch(resonant_frequency, dielectric_constant, thickness)
-    content = get_gerber_str(d)
+    content = get_gerber_str(d, feed_type)
     with (open(file_name, 'w')) as f:
         f.write(content)
 
@@ -141,12 +141,18 @@ def m_to_inch(val):
     return 39.3701 * val
 
 
-def get_gerber_str(d):
+def get_gerber_str(d, feed_type):
     fl = m_to_inch(d.feeder_length)
     fw = m_to_inch(d.feeder_width)
     pl = m_to_inch(d.patch_length)
     pw = m_to_inch(d.patch_width)
     fringing_l = m_to_inch(d.get_fringing_l())
+    gerber = get_inset_feed_gerber(fl, fw, pl, pw, fringing_l, d) if feed_type == 'inset' else \
+        get_normal_feed_gerber(fl, fw, pl, pw, fringing_l)
+    return gerber
+
+
+def get_normal_feed_gerber(fl, fw, pl, pw, fringing_l):
     init_x = "{:.4f}".format((fl/2) + fringing_l).replace('.', '')
     init_y = "{:.4f}".format(fringing_l).replace('.', '')
     patch_x = "{:.4f}".format(fl + fringing_l + (pl/2)).replace('.', '')
@@ -168,6 +174,47 @@ D14*
 X{init_x}Y{init_y}D03*
 D15*
 X{patch_x}*
+M02*
+    """
+    return gerber_format
+
+
+def get_inset_feed_gerber(fl, fw, pl, pw, fringing_l, d):
+    inset_l = m_to_inch(d.inset_length)
+    inset_g = m_to_inch(d.inset_gap)
+    pl_s = pl - inset_l
+    init_x = "{:.4f}".format((fl/2) + fringing_l).replace('.', '')
+    init_y = "{:.4f}".format(fringing_l).replace('.', '')
+    patch_x = "{:.4f}".format(fl + fringing_l + inset_l + (pl_s/2)).replace('.', '')
+    inset_x = "{:.4f}".format(fl + fringing_l + (inset_l/2)).replace('.', '')
+    inset_top_y = "{:.4f}".format(fw/2 + inset_g + (inset_g/2) + fringing_l).replace('.', '')
+    inset_y = "{:.4f}".format(fringing_l).replace('.', '')
+    inset_down_y = "{:.4f}".format(fringing_l - (fw/2 + inset_g + (inset_g/2))).replace('.', '')
+    gerber_format = f"""
+G04 ===== Begin FILE IDENTIFICATION =====*
+G04 File Format:  Gerber RS274X*
+G04 ===== End FILE IDENTIFICATION =====*
+%FSLAX24Y24*%
+%MOIN*%
+%SFA1.0000B1.0000*%
+%OFA0.0B0.0*%
+%ADD14R,{fl}X{fw}*%
+%ADD15R,{pl_s}X{pw}*%
+%ADD16R,{inset_l}X{inset_g}*%
+%LNcond*%
+%IPPOS*%
+%LPD*%
+G75*
+D14*
+X{init_x}Y{init_y}D03*
+D15*
+X{patch_x}*
+D16*
+X{inset_x}Y{inset_top_y}*
+D16*
+X{inset_x}Y{inset_y}*
+D16*
+X{inset_x}Y{inset_down_y}*
 M02*
     """
     return gerber_format

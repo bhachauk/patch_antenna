@@ -17,5 +17,11 @@ result = pa.design(freq, er, h)
 print(json.dumps(result, indent=4))
 
 
-# To write as gerber file
-pa.write_gerber(freq, er, h, '/tmp/patch_design.gbr')
+# To write as gerber file for both types
+
+# normal feed
+pa.write_gerber(freq, er, h, '/tmp/patch_normal_design.gbr', 'normal')
+
+# inset feed
+pa.write_gerber(freq, er, h, '/tmp/patch_inset_design.gbr', 'inset')
+
