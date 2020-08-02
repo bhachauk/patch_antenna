@@ -7,7 +7,7 @@ with open(path.join(this_directory, 'readme.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(name='patch_antenna',
-      version='0.0.4',
+      version='0.0.5',
       long_description=long_description,
       long_description_content_type='text/markdown',
       description='A simple patch antenna design library',
