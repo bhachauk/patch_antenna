@@ -67,4 +67,4 @@ pa.write_gerber(freq, er, h, 'patch_design_inset_2.4GHz_4.4_er_1.6_h.gbr', 'inse
 
 #### Future:
 
-- Generating `gerber` files for inset feed type too.
+- Design and gerber generation for phased arrays.
