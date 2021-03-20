@@ -1,5 +1,5 @@
 __name__ = 'design_patch_antenna'
-__version__ = '0.0.6'
+__version__ = '0.0.7'
 
 from .designer import design
 from .designer import DesignPatch
