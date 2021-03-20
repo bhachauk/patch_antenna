@@ -61,6 +61,15 @@ class DesignPatch:
             er (float): Dielectric constant of the cavity material.
             h (float): Thickness of the cavity in m.
         """
+        if not 10 ** 6 <= freq <= 100 * 10 ** 9:
+            raise ValueError("Frequency value should be in between 1MHz to 100 GHz")
+
+        if not 0 < er <= 10**5:
+            raise ValueError("Dielectric constant value should be in greater than 0 and smaller or equals 100,000")
+
+        if not 0 < h <= 1:
+            raise ValueError("Thickness value should be in greater than 0 and smaller or equals 1 meter")
+
         self.freq = freq
         self.er = er
         self.h = h
