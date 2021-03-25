@@ -70,3 +70,11 @@ pa.write_gerber(freq, er, h, 'patch_design_inset_2.4GHz_4.4_er_1.6_h.gbr', 'inse
 #### Future:
 
 - Design and gerber generation for patch antenna arrays and including other parameters calculation.
+
+
+#### Note
+
+Patch antenna design, 3D simulation, and Gerber file facility also published as Web-Live application.
+
+- [Patch antenna util - Web Live Application](https://bhanuchander210.github.io/patch-antenna-util/)
+- [Patch antenna util - GitHub](https://github.com/Bhanuchander210/patch-antenna-util)
