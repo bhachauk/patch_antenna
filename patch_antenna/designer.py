@@ -1,36 +1,39 @@
 import math
 from math import cos, sin, sqrt, pi
 from scipy import integrate
+import json
 
-
-# names
-frequency_n = 'frequency'
-patch_width_n = 'patch_width'
-patch_length_n = 'patch_length'
-feeder_width_n = 'feeder_width'
-feeder_length_n = 'feeder_length'
-inset_gap_width_n = 'inset_gap_width'
-inset_length_n = 'inset_length'
-ground_length_n = 'ground_length'
-ground_width_n = 'ground_width'
-edge_impedance_n = 'input_edge_impedance'
 
 # constants
 light_velocity = 299792458
 impedance = 50
 
 
+class Result:
+    def __init__(self):
+        self.frequency = None
+        self.patch_width = None
+        self.patch_length = None
+        self.feeder_width = None
+        self.feeder_length = None
+        self.inset_gap_width = None
+        self.inset_length = None
+        self.ground_length = None
+        self.ground_width = None
+        self.input_edge_impedance = None
+
+
+def design_string(resonant_frequency, dielectric_constant, thickness):
+    return json.dumps(design_result(resonant_frequency, dielectric_constant, thickness).__dict__, indent=4)
+
+
+def design_result(resonant_frequency, dielectric_constant, thickness):
+    return design(resonant_frequency, dielectric_constant, thickness).get_result()
+
+
 def design(resonant_frequency, dielectric_constant, thickness):
     """calculates length and width of patch antenna from dielectric constant, thickness and resonant frequency"""
-    return DesignPatch(resonant_frequency, dielectric_constant, thickness).get_result()
-
-
-def write_gerber(resonant_frequency, dielectric_constant, thickness, file_name, feed_type):
-    """Calculate design values in inch"""
-    d = DesignPatch(resonant_frequency, dielectric_constant, thickness)
-    content = get_gerber_str(d, feed_type)
-    with (open(file_name, 'w')) as f:
-        f.write(content)
+    return DesignPatch(resonant_frequency, dielectric_constant, thickness)
 
 
 class DesignPatch:
@@ -100,17 +103,17 @@ class DesignPatch:
         self.ground_width = self.patch_width + self.feeder_width + self.get_fringing_l()
 
     def get_result(self):
-        result = dict()
-        result[frequency_n] = self.freq
-        result[patch_width_n] = self.patch_width
-        result[patch_length_n] = self.patch_length
-        result[feeder_width_n] = self.feeder_width
-        result[feeder_length_n] = self.feeder_length
-        result[inset_gap_width_n] = self.inset_gap
-        result[inset_length_n] = self.inset_length
-        result[ground_length_n] = self.ground_length
-        result[ground_width_n] = self.ground_width
-        result[edge_impedance_n] = self.input_impedance
+        result = Result()
+        result.frequency = self.freq
+        result.patch_width = self.patch_width
+        result.patch_length = self.patch_length
+        result.feeder_width = self.feeder_width
+        result.feeder_length = self.feeder_length
+        result.inset_gap_width = self.inset_gap
+        result.inset_length = self.inset_length
+        result.ground_length = self.ground_length
+        result.ground_width = self.ground_width
+        result.edge_impedance = self.input_impedance
         return result
 
     def get_fringing_l(self):
@@ -227,3 +230,15 @@ X{inset_x}Y{inset_down_y}*
 M02*
     """
     return gerber_format
+
+
+def write_gerber(resonant_frequency, dielectric_constant, thickness, file_name, feed_type):
+    """Calculate design values in inch"""
+    d = DesignPatch(resonant_frequency, dielectric_constant, thickness)
+    write_gerber_design(d, file_name, feed_type)
+
+
+def write_gerber_design(design_: DesignPatch, file_name, feed_type="normal"):
+    content = get_gerber_str(design_, feed_type)
+    with (open(file_name, 'w')) as f:
+        f.write(content)
