@@ -6,6 +6,7 @@ python:
   - "3.7"
 
 before_install:
+  - pip3 install scipy
   - python3 setup.py install
 
 script: pytest
