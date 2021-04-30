@@ -8,7 +8,7 @@ python:
 before_install:
   - python3 setup.py install
 
-script: python3 examples/simple_design.py
+script: pytest
 
 notifications:
   email: false
