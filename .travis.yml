@@ -9,7 +9,9 @@ before_install:
   - pip3 install scipy
   - python3 setup.py install
 
-script: pytest
+script:
+  - pytest --cov-report term --cov-report xml:coverage.xml --cov=patch_antenna tests/test_patch_antenna.py
+  - curl -Os https://uploader.codecov.io/latest/linux/codecov && chmod +x codecov && ./codecov -t 98a19ccc-20be-4af6-9c61-0163b5110abb
 
 notifications:
   email: false
