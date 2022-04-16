@@ -58,3 +58,7 @@ def test_gerber_inset():
     pa_design = pa.design(freq, er, h)
     pa.write_gerber_design(pa_design, "test1.gbr", feed_type="inset")
     assert True
+
+
+if __name__ == '__main__':
+    pass
