@@ -9,6 +9,7 @@ before_install:
   - pip3 install scipy
   - pip3 install setuptools==58.0.4
   - python3 setup.py install
+  - pip install pytest-codecov
 
 script:
   - pytest --cov-report term --cov-report xml:coverage.xml --cov=patch_antenna tests/test_patch_antenna.py
