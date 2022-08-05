@@ -1,10 +1,9 @@
-sudo: false
-
-language: python
 dist: focal
+sudo: false
+language: python
 
 python:
-  - "3.10.4"
+  - "3.10"
 
 before_install:
   - pip3 install scipy==1.9.0
