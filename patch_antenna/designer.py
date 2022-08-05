@@ -2,6 +2,8 @@ import math
 from math import cos, sin, sqrt, pi
 from scipy import integrate
 import json
+from gerber_writer import DataLayer, Path, set_generation_software
+from patch_antenna import __name__, __version__, __owner__
 
 
 # constants
@@ -153,83 +155,90 @@ def m_to_inch(val):
     return 39.3701 * val
 
 
-def get_gerber_str(d, feed_type):
-    fl = m_to_inch(d.feeder_length)
-    fw = m_to_inch(d.feeder_width)
-    pl = m_to_inch(d.patch_length)
-    pw = m_to_inch(d.patch_width)
-    fringing_l = m_to_inch(d.get_fringing_l())
-    gerber = get_inset_feed_gerber(fl, fw, pl, pw, fringing_l, d) if feed_type == 'inset' else \
-        get_normal_feed_gerber(fl, fw, pl, pw, fringing_l)
-    return gerber
+def m_to_mm(val):
+    return val * 10**3
 
 
-def get_normal_feed_gerber(fl, fw, pl, pw, fringing_l):
-    init_x = "{:.4f}".format((fl/2) + fringing_l).replace('.', '')
-    init_y = "{:.4f}".format(fringing_l).replace('.', '')
-    patch_x = "{:.4f}".format(fl + fringing_l + (pl/2)).replace('.', '')
-    gerber_format = f"""
-G04 ===== Begin FILE IDENTIFICATION =====*
-G04 File Format:  Gerber RS274X*
-G04 ===== End FILE IDENTIFICATION =====*
-%FSLAX24Y24*%
-%MOIN*%
-%SFA1.0000B1.0000*%
-%OFA0.0B0.0*%
-%ADD14R,{fl}X{fw}*%
-%ADD15R,{pl}X{pw}*%
-%LNcond*%
-%IPPOS*%
-%LPD*%
-G75*
-D14*
-X{init_x}Y{init_y}D03*
-D15*
-X{patch_x}*
-M02*
-    """
-    return gerber_format
+class FeedType:
+    INSET = 'inset'
+    NORMAL = 'normal'
 
 
-def get_inset_feed_gerber(fl, fw, pl, pw, fringing_l, d):
-    inset_l = m_to_inch(d.inset_length)
-    inset_g = m_to_inch(d.inset_gap)
-    pl_s = pl - inset_l
-    init_x = "{:.4f}".format((fl/2) + fringing_l).replace('.', '')
-    init_y = "{:.4f}".format(fringing_l).replace('.', '')
-    patch_x = "{:.4f}".format(fl + fringing_l + inset_l + (pl_s/2)).replace('.', '')
-    inset_x = "{:.4f}".format(fl + fringing_l + (inset_l/2)).replace('.', '')
-    inset_top_y = "{:.4f}".format(fw/2 + inset_g + (inset_g/2) + fringing_l).replace('.', '')
-    inset_y = "{:.4f}".format(fringing_l).replace('.', '')
-    inset_down_y = "{:.4f}".format(fringing_l - (fw/2 + inset_g + (inset_g/2))).replace('.', '')
-    gerber_format = f"""
-G04 ===== Begin FILE IDENTIFICATION =====*
-G04 File Format:  Gerber RS274X*
-G04 ===== End FILE IDENTIFICATION =====*
-%FSLAX24Y24*%
-%MOIN*%
-%SFA1.0000B1.0000*%
-%OFA0.0B0.0*%
-%ADD14R,{fl}X{fw}*%
-%ADD15R,{pl_s}X{pw}*%
-%ADD16R,{inset_l}X{inset_g}*%
-%LNcond*%
-%IPPOS*%
-%LPD*%
-G75*
-D14*
-X{init_x}Y{init_y}D03*
-D15*
-X{patch_x}*
-D16*
-X{inset_x}Y{inset_top_y}*
-D16*
-X{inset_x}Y{inset_y}*
-D16*
-X{inset_x}Y{inset_down_y}*
-M02*
-    """
-    return gerber_format
+class PatchGerberWriter:
+
+    def __init__(self, pa_design: DesignPatch):
+        self.pl = m_to_mm(pa_design.patch_length)
+        self.pw = m_to_mm(pa_design.patch_width)
+        self.fl = m_to_mm(pa_design.feeder_length)
+        self.fw = m_to_mm(pa_design.feeder_width)
+        self.frl = m_to_mm(pa_design.get_fringing_l())
+        self.il = m_to_mm(pa_design.inset_length)
+        self.ig = m_to_mm(pa_design.inset_gap)
+        set_generation_software('Developed by: ' + __owner__, 'pypi lib: ' + __name__, 'version: ' + __version__)
+
+    def get_normal_feed_points(self):
+        _st = (0, 0)
+        pts = [
+            (self.pl, 0),
+            (self.pl, (self.pw / 2) - (self.fw / 2)),
+            (self.pl + self.fl, (self.pw / 2) - (self.fw / 2)),
+            (self.pl + self.fl, (self.pw / 2) - (self.fw / 2) + self.fw),
+            (self.pl, (self.pw / 2) - (self.fw / 2) + self.fw),
+            (self.pl, self.pw),
+            (0, self.pw),
+            _st
+        ]
+        return _st, pts
+
+    def get_inset_feed_points(self):
+        _st = (0, 0)
+        pts = [
+            (self.pl, 0),
+            (self.pl, ((self.pw-self.fw)/2)-self.ig),
+            (self.pl - self.il, ((self.pw-self.fw) / 2) - self.ig),
+            (self.pl - self.il, ((self.pw-self.fw) / 2)),
+            (self.pl - self.il + self.fl, ((self.pw-self.fw) / 2)),
+            (self.pl - self.il + self.fl, ((self.pw + self.fw) / 2)),
+            (self.pl - self.il, ((self.pw + self.fw) / 2)),
+            (self.pl - self.il, ((self.pw + self.fw) / 2) + self.ig),
+            (self.pl, ((self.pw + self.fw) / 2) + self.ig),
+            (self.pl, self.pw),
+            (0, self.pw),
+            _st
+        ]
+        return _st, pts
+
+    def get_border(self):
+        _st = (0, 0)
+        pts = [
+            ((self.frl*2) + self.fl + self.pl, 0),
+            ((self.frl*2) + self.fl + self.pl, (self.frl*2) + self.pw),
+            (0, (self.frl*2) + self.pw),
+            _st
+        ]
+        return _st, pts
+
+    def write_gerber(self, path: str, _type: str = FeedType.NORMAL):
+        __type_dict = {
+            FeedType.NORMAL: self.get_normal_feed_points,
+            FeedType.INSET: self.get_inset_feed_points
+        }
+        border_st, border_pts = self.get_border()
+        (init_x, init_y), pts = __type_dict.get(_type)()
+
+        profile_layer = DataLayer('Copper,L1,Top')
+        _ant_prof = Path()
+        _ant_prof.moveto((init_x + self.frl, init_y + self.frl))
+        [_ant_prof.lineto((self.frl + x, self.frl + y)) for x, y in pts]
+        profile_layer.add_region(_ant_prof, 'Other,Antenna')
+
+        _bord_prof = Path()
+        _bord_prof.moveto(border_st)
+        [_bord_prof.lineto(_pts) for _pts in border_pts]
+        profile_layer.add_traces_path(_bord_prof, 0.5, 'Profile')
+
+        with open(path, 'w') as outfile:
+            profile_layer.dump_gerber(outfile)
 
 
 def write_gerber(resonant_frequency, dielectric_constant, thickness, file_name, feed_type):
@@ -239,6 +248,5 @@ def write_gerber(resonant_frequency, dielectric_constant, thickness, file_name, 
 
 
 def write_gerber_design(design_: DesignPatch, file_name, feed_type="normal"):
-    content = get_gerber_str(design_, feed_type)
-    with (open(file_name, 'w')) as f:
-        f.write(content)
+    gw = PatchGerberWriter(design_)
+    gw.write_gerber(file_name, feed_type)

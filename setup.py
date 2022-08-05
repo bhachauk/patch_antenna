@@ -18,5 +18,5 @@ setup(name='patch_antenna',
       packages=['patch_antenna'],
       include_package_data=True,
       zip_safe=False,
-      install_requires=['scipy']
+      install_requires=['scipy==1.9.0', 'gerber_writer=0.0.3']
       )

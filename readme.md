@@ -7,10 +7,15 @@ A simple patch antenna design library
 
 ## Prerequisite
 
-Install package `scipy` using the command shown below.
+Python environment
+
+- python=3.10
+
+- Install below packages
 
 ```
-pip install scipy
+pip install scipy==1.9.0
+pip install gerber_writer==0.0.3
 ```
 
 
