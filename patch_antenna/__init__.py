@@ -1,5 +1,5 @@
 __name__ = 'patch_antenna'
-__version__ = '0.0.9'
+__version__ = '0.1.0'
 __owner__ = 'bhanuchander210'
 
 from .designer import design
