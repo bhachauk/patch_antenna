@@ -163,6 +163,12 @@ class FeedType:
     INSET = 'inset'
     NORMAL = 'normal'
 
+    @staticmethod
+    def check(_type: str):
+        _valid_types = [FeedType.INSET, FeedType.NORMAL]
+        if _type not in _valid_types:
+            raise ValueError('Type should be : {}'.format(", ".join(_valid_types)))
+
 
 class PatchGerberWriter:
 
@@ -242,11 +248,13 @@ class PatchGerberWriter:
 
 
 def write_gerber(resonant_frequency, dielectric_constant, thickness, file_name, feed_type):
+    FeedType.check(feed_type)
     """Calculate design values in inch"""
     d = DesignPatch(resonant_frequency, dielectric_constant, thickness)
     write_gerber_design(d, file_name, feed_type)
 
 
-def write_gerber_design(design_: DesignPatch, file_name, feed_type="normal"):
+def write_gerber_design(design_: DesignPatch, file_name, feed_type=FeedType.NORMAL):
+    FeedType.check(feed_type)
     gw = PatchGerberWriter(design_)
     gw.write_gerber(file_name, feed_type)

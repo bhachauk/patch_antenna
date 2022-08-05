@@ -7,7 +7,7 @@ def test_frequency_limit():
     with pytest.raises(ValueError) as execinfo:
         pa.design(0, 0, 0)
 
-    return execinfo.value.args[0] == 'Frequency value should be in between 1MHz to 100 GHz'
+    assert execinfo.value.args[0] == 'Frequency value should be in between 1MHz to 100 GHz'
 
 
 def test_dielectric_limit():
@@ -15,7 +15,7 @@ def test_dielectric_limit():
     with pytest.raises(ValueError) as execinfo:
         pa.design(10 ** 9, 0, 0)
 
-    return execinfo.value.args[0] == 'Dielectric constant value should be in greater than 0 and smaller or equals 100,000'
+    assert execinfo.value.args[0] == 'Dielectric constant value should be in greater than 0 and smaller or equals 100,000'
 
 
 def test_thickness_limit():
@@ -23,7 +23,17 @@ def test_thickness_limit():
     with pytest.raises(ValueError) as execinfo:
         pa.design(10 ** 9, 1, 0)
 
-    return execinfo.value.args[0] == 'Thickness value should be in greater than 0 and smaller or equals 1 meter'
+    assert execinfo.value.args[0] == 'Thickness value should be in greater than 0 and smaller or equals 1 meter'
+
+
+def test_type():
+
+    with pytest.raises(ValueError) as execinfo:
+        freq = 2.4 * 10 ** 9
+        er = 4.4
+        h = 1.6 * 10 ** -3
+        pa.write_gerber(freq, er, h, 'test.gbr', "dummy")
+    assert execinfo.value.args[0] == 'Type should be : inset, normal'
 
 
 def test_design_string():
