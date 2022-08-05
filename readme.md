@@ -15,7 +15,7 @@ Python environment
 
 ```
 pip install scipy==1.9.0
-pip install gerber_writer==0.0.3
+pip install gerber_writer==0.3.4
 ```
 
 
