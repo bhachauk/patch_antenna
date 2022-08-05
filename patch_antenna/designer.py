@@ -151,10 +151,6 @@ class DesignPatch:
         self.input_impedance = 1 / (2 * (G1 + G12))
 
 
-def m_to_inch(val):
-    return 39.3701 * val
-
-
 def m_to_mm(val):
     return val * 10**3
 
