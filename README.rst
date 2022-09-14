@@ -7,8 +7,6 @@ Design Patch Antenna
 
 A simple patch antenna design library
 
-.. image:: https://api.travis-ci.com/bhanuchander210/patch_antenna.png
-
 
 Prerequisite
 ------------
