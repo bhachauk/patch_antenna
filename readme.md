@@ -3,7 +3,7 @@
 A simple patch antenna design library
 
 [![status](https://api.travis-ci.com/bhanuchander210/patch_antenna.png)](https://travis-ci.com/github/Bhanuchander210/patch_antenna)
-[![Downloads](https://static.pepy.tech/personalized-badge/patch-antenna?period=total&units=none&left_color=black&right_color=green&left_text=Downloads)](https://pepy.tech/project/patch-antenna)
+[![Downloads](https://static.pepy.tech/personalized-badge/patch-antenna?period=total&units=none&left_color=grey&right_color=green&left_text=Downloads)](https://pepy.tech/project/patch-antenna)
 [![coverage](https://img.shields.io/codecov/c/github/bhanuchander210/patch_antenna)](https://app.codecov.io/gh/Bhanuchander210/patch_antenna)
 
 #### Documentation
