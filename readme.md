@@ -1,6 +1,4 @@
-# Patch Antenna
-
-A simple patch antenna design library
+![](docs/source/patch_logo_title.png)
 
 [![status](https://api.travis-ci.com/bhanuchander210/patch_antenna.png)](https://travis-ci.com/github/Bhanuchander210/patch_antenna)
 [![Downloads](https://static.pepy.tech/personalized-badge/patch-antenna?period=total&units=none&left_color=grey&right_color=green&left_text=Downloads)](https://pepy.tech/project/patch-antenna)
