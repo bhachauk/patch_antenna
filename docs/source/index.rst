@@ -1,4 +1,4 @@
--- image:: https://raw.githubusercontent.com/Bhanuchander210/patch_antenna/master/docs/source/patch_logo_title.png
+.. image:: https://raw.githubusercontent.com/Bhanuchander210/patch_antenna/master/docs/source/patch_logo_title.png
 
 
 Design Patch Antenna
